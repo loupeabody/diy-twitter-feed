@@ -1,0 +1,12 @@
+doctype html
+html(lang="en")
+	head
+		title Twitter API
+	body
+		each tweet in tweets
+			div(class="tweet")
+				p= tweet.name
+					span (@#{tweet.username})
+				p= tweet.text
+				p= tweet.ts
+			hr

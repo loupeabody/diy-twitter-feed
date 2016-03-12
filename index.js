@@ -1,7 +1,9 @@
 var https = require('https'),
+		http = require('http'),
 		querystring = require('querystring'),
 		promise = require('promise'),
 		btoa = require('btoa'),
+		jade = require('jade'),
 		config = require('./config')
 
 function makeRequest(options,body) {
@@ -60,8 +62,9 @@ function getUserTweets(token,query) {
 }
 
 var tweets = []
-// Generate Request Token
-// Get User Tweets
+
+// generate request token
+// and get user tweets
 twitterOAuthToken()
 	.then(function(token) {
 		var access_token = JSON.parse(token)["access_token"]
@@ -77,6 +80,21 @@ twitterOAuthToken()
 				"text":d["text"]
 			}
 		})
-		console.log(tweets)
+		return tweets
 	})
-	.catch(function(err) { console.error(err) })
+	.then(function(tweets) {
+		var fn = jade.compileFile('./views/index.jade', {pretty: true}),
+				view = fn({tweets: tweets})
+
+		var server = http.createServer(function(req,res) {
+			res.writeHead(200,{"Content-Type":"text/html"})
+			res.write(view)
+			res.end()
+		})
+
+		server.listen(3535)
+		console.log('server listening on port 3535')
+	})
+	.catch(function(err) {})
+
+
