@@ -1,5 +1,5 @@
 var https = require('https'),
-		http = require('http'),
+		express = require('express'),
 		querystring = require('querystring'),
 		promise = require('promise'),
 		btoa = require('btoa'),
@@ -61,17 +61,16 @@ function getUserTweets(token,query) {
 	return makeRequest(options)
 }
 
-var tweets = []
-
 // generate request token
-// and get user tweets
+// get user tweets
+// render with http server
 twitterOAuthToken()
 	.then(function(token) {
 		var access_token = JSON.parse(token)["access_token"]
 		return getUserTweets(access_token,{"count":5,"screen_name":"kottke"})
 	})
 	.then(function(response) {
-		tweets = JSON.parse(response).map(function(d) {
+		return JSON.parse(response).map(function(d) {
 			return {
 				"id":d["id"],
 				"name":d["user"]["name"],
@@ -80,21 +79,21 @@ twitterOAuthToken()
 				"text":d["text"]
 			}
 		})
-		return tweets
 	})
 	.then(function(tweets) {
 		var fn = jade.compileFile('./views/index.jade', {pretty: true}),
 				view = fn({tweets: tweets})
 
-		var server = http.createServer(function(req,res) {
-			res.writeHead(200,{"Content-Type":"text/html"})
-			res.write(view)
-			res.end()
+		var app = express()
+
+		app.use(express.static(__dirname + '/public'))
+
+		app.get('/', function(req,res) {
+			res.send(view)
 		})
 
-		server.listen(3535)
-		console.log('server listening on port 3535')
+		app.listen(3535,function() {
+			console.log('server listening on port 3535')
+		})
 	})
 	.catch(function(err) {})
-
-
