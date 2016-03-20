@@ -1,4 +1,48 @@
 html { box-sizing: border-box; }
 *, *:before, *:after { box-sizing: inherit; }
 
-body { background: magenta; }
+body {
+	color: #131313;
+	background: magenta;
+	font-family: 'Source Sans Pro', serif;
+}
+
+.cf:before,
+.cf:after {
+		content: " "; /* 1 */
+		display: table; /* 2 */
+}
+
+.cf:after {
+		clear: both;
+}
+
+.tweet {
+	position: relative;
+	max-width: 600px;
+	padding-bottom: 10px;
+	border-bottom: 2px solid rgba(19,19,19,0.6);
+	margin-left: auto;
+	margin-right: auto;
+	margin-bottom: 25px;
+}
+
+.tweet-body {
+	color: rgba(19,19,19,0.88);
+	font-size: 1.6rem;
+	line-height: 1.9rem;
+	font-weight: 700;
+	margin: 15px 0;
+}
+
+.tweet-author,
+.tweet-time {
+	color: rgba(19,19,19,0.75);
+	font-size: 0.9rem;
+	font-weight: 700;
+	display: inline-block;
+	margin: 0;
+}
+
+.tweet-author { float: left; }
+.tweet-time { float: right; }
