@@ -4,6 +4,7 @@ var https = require('https'),
 		promise = require('promise'),
 		btoa = require('btoa'),
 		jade = require('jade'),
+		moment = require('moment'),
 		config = require('./config')
 
 function makeRequest(options,body) {
@@ -72,11 +73,11 @@ twitterOAuthToken()
 	.then(function(response) {
 		return JSON.parse(response).map(function(d) {
 			return {
-				"id":d["id"],
-				"name":d["user"]["name"],
-				"username":d["user"]["screen_name"],
-				"ts":d["created_at"],
-				"text":d["text"]
+				"id": d["id"],
+				"name": d["user"]["name"],
+				"username": d["user"]["screen_name"],
+				"ts": moment(d["created_at"],'dd MMM DD HH:mm:ss ZZ YYYY','en').fromNow(),
+				"text": d["text"]
 			}
 		})
 	})
