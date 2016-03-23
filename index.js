@@ -62,39 +62,44 @@ function getUserTweets(token,query) {
 	return makeRequest(options)
 }
 
-// generate request token
-// get user tweets
-// render with http server
-twitterOAuthToken()
-	.then(function(token) {
-		var access_token = JSON.parse(token)["access_token"]
-		return getUserTweets(access_token,{"count":5,"screen_name":"kottke"})
-	})
-	.then(function(response) {
-		return JSON.parse(response).map(function(d) {
-			return {
-				"id": d["id"],
-				"name": d["user"]["name"],
-				"username": d["user"]["screen_name"],
-				"ts": moment(d["created_at"],'dd MMM DD HH:mm:ss ZZ YYYY','en').fromNow(),
-				"text": d["text"]
-			}
+var fn = jade.compileFile('./views/index.jade', {pretty: true}),
+		app = express()
+
+app.use(express.static(__dirname + '/public'))
+
+// default route... serve the client app
+app.get('/', function(req,res) {
+	res.send('diy-twitter-feed is mostly a front-end app')
+})
+
+// respond with user tweets as JSON
+app.get('/tweets', function(req,res) {
+
+	var q = {"count":5,"screen_name":req.params.usn}
+
+	twitterOAuthToken()
+		.then(function(r) {
+			var token = JSON.parse(r)["access_token"]
+			return getUserTweets(token,q)
 		})
-	})
-	.then(function(tweets) {
-		var fn = jade.compileFile('./views/index.jade', {pretty: true}),
-				view = fn({tweets: tweets})
+		.then(function(r) {
+			res.send(r)
+			var responseJSON = JSON.parse(r).map(function(d) {
+						return {
+							"id": d["id"],
+							"name": d["user"]["name"],
+							"username": d["user"]["screen_name"],
+							"ts": moment(d["created_at"],'dd MMM DD HH:mm:ss ZZ YYYY','en').fromNow(),
+							"text": d["text"]
+						}
+					})
 
-		var app = express()
-
-		app.use(express.static(__dirname + '/public'))
-
-		app.get('/', function(req,res) {
-			res.send(view)
+			res.setHeader('Content-Type','application/json')
+			res.send(JSON.stringify(responseJSON),null,3)
 		})
+		.catch(function(err) { res.send(err) })
+})
 
-		app.listen(3535,function() {
-			console.log('server listening on port 3535')
-		})
-	})
-	.catch(function(err) {})
+app.listen(3535,function() {
+	console.log('server listening on port 3535')
+})
