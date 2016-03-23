@@ -3,11 +3,8 @@ var https = require('https'),
 		querystring = require('querystring'),
 		promise = require('promise'),
 		btoa = require('btoa'),
-		jade = require('jade'),
 		moment = require('moment'),
 		config = require('./config')
-
-var access_token = ''
 
 function makeRequest(options,body) {
 
@@ -64,26 +61,34 @@ function getUserTweets(token,query) {
 	return makeRequest(options)
 }
 
-var fn = jade.compileFile('./views/index.jade', {pretty: true}),
-		app = express()
+var app = express()
 
 app.use(express.static(__dirname + '/public'))
 
 // default route... serve the client app
 app.get('/', function(req,res) {
-	res.send('diy-twitter-feed is mostly a front-end app')
+	res.redirect(301,'http://www.google.com/teapot')
+})
+
+// respond with Twitter token
+app.get('/token', function(req,res) {
+	twitterOAuthToken()
+		.then(function(r) {
+			var token = { "token": JSON.parse(r)["access_token"] }
+
+			res.setHeader('Content-Type','application/json')
+			res.send(JSON.stringify(token),null,3)
+		})
+		.catch(function(err) { res.send(err) })
 })
 
 // respond with user tweets as JSON
-app.get('/tweets/:usn', function(req,res) {
+app.get('/tweets/:token/:usn', function(req,res) {
 
-	var q = {"count":5,"screen_name":req.params.usn}
+	var query = {"count":5,"screen_name":req.params.usn},
+			token =	req.params.token
 
-	twitterOAuthToken()
-		.then(function(r) {
-			var token = JSON.parse(r)["access_token"]
-			return getUserTweets(token,q)
-		})
+	getUserTweets(token,query)
 		.then(function(r) {
 			var responseJSON = JSON.parse(r).map(function(d) {
 						return {
