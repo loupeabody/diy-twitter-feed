@@ -7,6 +7,8 @@ var https = require('https'),
 		moment = require('moment'),
 		config = require('./config')
 
+var access_token = ''
+
 function makeRequest(options,body) {
 
 	return new Promise(function(resolve, reject) {
@@ -55,7 +57,7 @@ function getUserTweets(token,query) {
 				path: '/1.1/statuses/user_timeline.json?'+tweetQuery,
 				method: 'GET',
 				headers: {
-					"Authorization":"Bearer "+token
+					"Authorization": "Bearer "+token
 				}
 			}
 
@@ -73,7 +75,7 @@ app.get('/', function(req,res) {
 })
 
 // respond with user tweets as JSON
-app.get('/tweets', function(req,res) {
+app.get('/tweets/:usn', function(req,res) {
 
 	var q = {"count":5,"screen_name":req.params.usn}
 
@@ -83,7 +85,6 @@ app.get('/tweets', function(req,res) {
 			return getUserTweets(token,q)
 		})
 		.then(function(r) {
-			res.send(r)
 			var responseJSON = JSON.parse(r).map(function(d) {
 						return {
 							"id": d["id"],
