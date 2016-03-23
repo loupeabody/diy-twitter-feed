@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<title>Twitter API</title>
+		<link rel="stylesheet" href="styles/style.css">
+		<link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,300,600,700,900" rel="stylesheet" type="text/css">
+	</head>
+	<body>
+		<script type="text/javascript">
+			function makeTweetDOM(tweet) {
+				var div = document.createElement('div'),
+						body = document.createElement('p'),
+						author = document.createElement('p'),
+						username = document.createElement('span'),
+						time = document.createElement('p')
+
+				div.classList.add('tweet','cf')
+				body.classList.add('tweet-body')
+				author.classList.add('tweet-author')
+				username.classList.add('tweet-username')
+				time.classList.add('tweet-time')
+
+				body.innerText = tweet["text"]
+				author.innerText = tweet["name"]
+				username.innerText = "(@"+tweet["username"]+")"
+				time.innerText = tweet["ts"]
+
+				author.appendChild(username)
+
+				div.appendChild(body)
+				div.appendChild(author)
+				div.appendChild(time)
+
+				return div
+
+			}
+
+			function makeRequest(method, url) {
+				return new Promise(function(resolve,reject) {
+					var xhr = new XMLHttpRequest()
+					xhr.addEventListener('error', reject)
+					xhr.addEventListener('load', resolve)
+					xhr.open(method, url)
+					xhr.send()
+				})
+			}
+
+			function getTwitterOAuthToken() { return makeRequest("GET", window.location.origin + "/token") }
+
+			function getUserTweets(token) { return makeRequest("GET", window.location.origin + "/tweets/"+encodeURIComponent(token)+"/kottke") }
+
+			getTwitterOAuthToken()
+				.then(function(r) {
+					var token = JSON.parse(r.currentTarget.response)["token"]
+					console.log(token)
+					return getUserTweets(token)
+				})
+				.then(function(r) {
+					console.log(r)
+					var tweets = JSON.parse(r.currentTarget.response)
+					tweets.map(function(t) { 
+						console.log(t)
+						document.body.appendChild(makeTweetDOM(t)) })
+				})
+				.catch(function(err) { console.log(err) })
+		</script>
+	</body>
+</html>

@@ -65,13 +65,9 @@ var app = express()
 
 app.use(express.static(__dirname + '/public'))
 
-// default route... serve the client app
-app.get('/', function(req,res) {
-	res.redirect(301,'http://www.google.com/teapot')
-})
-
 // respond with Twitter token
 app.get('/token', function(req,res) {
+	console.log('received request for token at /token')
 	twitterOAuthToken()
 		.then(function(r) {
 			var token = { "token": JSON.parse(r)["access_token"] }
@@ -84,7 +80,7 @@ app.get('/token', function(req,res) {
 
 // respond with user tweets as JSON
 app.get('/tweets/:token/:usn', function(req,res) {
-
+	console.log('received request for tweets at /tweets')
 	var query = {"count":5,"screen_name":req.params.usn},
 			token =	req.params.token
 
