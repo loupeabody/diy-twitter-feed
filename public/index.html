@@ -6,34 +6,17 @@
 		<link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,300,600,700,900" rel="stylesheet" type="text/css">
 	</head>
 	<body>
+		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.5/handlebars.min.js"></script>
+		<script id="tweet-template" type="text/x-handlebars-template">
+			<div class="tweet cf">
+				<p class="tweet-body">{{text}}</p>
+				<p class="tweet-author">{{name}}&nbsp;<span class="tweet-username">(@{{username}})</span></p>
+				<p class="tweet-time">{{ts}}</p>
+			</div>
+		</script>
 		<script type="text/javascript">
-			function makeTweetDOM(tweet) {
-				var div = document.createElement('div'),
-						body = document.createElement('p'),
-						author = document.createElement('p'),
-						username = document.createElement('span'),
-						time = document.createElement('p')
-
-				div.classList.add('tweet','cf')
-				body.classList.add('tweet-body')
-				author.classList.add('tweet-author')
-				username.classList.add('tweet-username')
-				time.classList.add('tweet-time')
-
-				body.innerText = tweet["text"]
-				author.innerText = tweet["name"]
-				username.innerText = "(@"+tweet["username"]+")"
-				time.innerText = tweet["ts"]
-
-				author.appendChild(username)
-
-				div.appendChild(body)
-				div.appendChild(author)
-				div.appendChild(time)
-
-				return div
-
-			}
+			var tweetTemplateSource = document.getElementById('tweet-template').innerHTML,
+					tweetTemplate = Handlebars.compile(tweetTemplateSource)
 
 			function makeRequest(method, url) {
 				return new Promise(function(resolve,reject) {
@@ -46,21 +29,16 @@
 			}
 
 			function getTwitterOAuthToken() { return makeRequest("GET", window.location.origin + "/token") }
-
 			function getUserTweets(token) { return makeRequest("GET", window.location.origin + "/tweets/"+encodeURIComponent(token)+"/kottke") }
 
 			getTwitterOAuthToken()
 				.then(function(r) {
 					var token = JSON.parse(r.currentTarget.response)["token"]
-					console.log(token)
 					return getUserTweets(token)
 				})
 				.then(function(r) {
-					console.log(r)
 					var tweets = JSON.parse(r.currentTarget.response)
-					tweets.map(function(t) { 
-						console.log(t)
-						document.body.appendChild(makeTweetDOM(t)) })
+					tweets.map(function(t) { document.body.innerHTML += tweetTemplate(t) })
 				})
 				.catch(function(err) { console.log(err) })
 		</script>
