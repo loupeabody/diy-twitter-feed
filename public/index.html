@@ -10,8 +10,14 @@
 		<script id="tweet-template" type="text/x-handlebars-template">
 			<div class="tweet cf">
 				<p class="tweet-body">{{text}}</p>
-				<p class="tweet-author">{{name}}&nbsp;<span class="tweet-username">(@{{username}})</span></p>
-				<p class="tweet-time">{{ts}}</p>
+				<p class="tweet-author">
+					{{name}}&nbsp;
+					<span class="tweet-username">
+						(<a href="https://twitter.com/{{username}}">@{{username}}</a>)
+					</span></p>
+				<p class="tweet-time">
+					<a href="https://twitter.com/{{username}}/status/{{id}}">{{ts}}</a>
+				</p>
 			</div>
 		</script>
 		<script type="text/javascript">
@@ -37,6 +43,7 @@
 					return getUserTweets(token)
 				})
 				.then(function(r) {
+					console.log(JSON.parse(r.currentTarget.response))
 					var tweets = JSON.parse(r.currentTarget.response)
 					tweets.map(function(t) { document.body.innerHTML += tweetTemplate(t) })
 				})

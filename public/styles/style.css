@@ -27,6 +27,9 @@ body {
 	margin-bottom: 25px;
 }
 
+.tweet a { color: rgba(19,19,19,0.75); }
+.tweet a:hover { text-decoration: none; }
+
 .tweet-body {
 	color: rgba(19,19,19,0.88);
 	font-size: 1.6rem;

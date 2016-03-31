@@ -88,11 +88,15 @@ app.get('/tweets/:token/:usn', function(req,res) {
 		.then(function(r) {
 			var responseJSON = JSON.parse(r).map(function(d) {
 						return {
-							"id": d["id"],
+							"id": d["id_str"],
 							"name": d["user"]["name"],
 							"username": d["user"]["screen_name"],
+							"created_at": d["created_at"],
 							"ts": moment(d["created_at"],'dd MMM DD HH:mm:ss ZZ YYYY','en').fromNow(),
-							"text": d["text"]
+							"text": d["text"],
+							"urls": d["entities"]["urls"],
+							"hashtags": d["entities"]["hashtags"],
+							"user_mentions": d["entities"]["user_mentions"]
 						}
 					})
 
