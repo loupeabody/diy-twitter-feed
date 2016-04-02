@@ -7,9 +7,16 @@
 	</head>
 	<body>
 		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.5/handlebars.min.js"></script>
+		<script id="main-template" type="text/x-handlebars-template">
+			<section class="tweets">
+				{{#each tweets}}
+					{{> tweetTemplate this}}
+				{{~/each}}
+			</section>
+		</script>
 		<script id="tweet-template" type="text/x-handlebars-template">
 			<div class="tweet cf">
-				<p class="tweet-body">{{text}}</p>
+				<p class="tweet-body">{{{addEntitiesToBody text entities}}}</p>
 				<p class="tweet-author">
 					{{name}}&nbsp;
 					<span class="tweet-username">
@@ -22,7 +29,22 @@
 		</script>
 		<script type="text/javascript">
 			var tweetTemplateSource = document.getElementById('tweet-template').innerHTML,
-					tweetTemplate = Handlebars.compile(tweetTemplateSource)
+					mainTemplateSource = document.getElementById('main-template').innerHTML,
+					mainTemplate = Handlebars.compile(mainTemplateSource),
+					tweetTemplate = Handlebars.compile(tweetTemplateSource),
+					locals = { users: [], terms: [], tweets: [] }
+
+			Handlebars.registerPartial('tweetTemplate',tweetTemplate)
+			Handlebars.registerHelper('addEntitiesToBody',function(body, entities) {
+				var newBody = body
+				if (entities.urls.length > 0) {
+					entities.urls.forEach(function(u) {
+						newBody = newBody.replace(u.url,"<a href="+u.url+">"+u.url+"</a>")
+					})
+				}
+				console.log(newBody)
+				return new Handlebars.SafeString(newBody)
+			})
 
 			function makeRequest(method, url) {
 				return new Promise(function(resolve,reject) {
@@ -35,19 +57,24 @@
 			}
 
 			function getTwitterOAuthToken() { return makeRequest("GET", window.location.origin + "/token") }
-			function getUserTweets(token) { return makeRequest("GET", window.location.origin + "/tweets/"+encodeURIComponent(token)+"/kottke") }
+			function getUserTweets(token,usn) { return makeRequest("GET", window.location.origin + "/tweets/"+encodeURIComponent(token)+"/"+usn) }
 
-			getTwitterOAuthToken()
-				.then(function(r) {
-					var token = JSON.parse(r.currentTarget.response)["token"]
-					return getUserTweets(token)
-				})
-				.then(function(r) {
-					console.log(JSON.parse(r.currentTarget.response))
-					var tweets = JSON.parse(r.currentTarget.response)
-					tweets.map(function(t) { document.body.innerHTML += tweetTemplate(t) })
-				})
-				.catch(function(err) { console.log(err) })
+			function addTweetsToLocals(usn) {
+				return getTwitterOAuthToken()
+					.then(function(r) {
+						var token = JSON.parse(r.currentTarget.response)["token"]
+						return getUserTweets(token,usn)
+					})
+					.then(function(r) {
+						console.log(JSON.parse(r.currentTarget.response))
+						var tweets = JSON.parse(r.currentTarget.response)
+						tweets.map(function(t) {
+							locals.tweets.push(t)
+						})
+					})
+					.then(function(r) { document.body.innerHTML += mainTemplate(locals)})
+					.catch(function(err) { console.log(err) })
+			}
 		</script>
 	</body>
 </html>

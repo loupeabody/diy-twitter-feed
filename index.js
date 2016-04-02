@@ -94,9 +94,7 @@ app.get('/tweets/:token/:usn', function(req,res) {
 							"created_at": d["created_at"],
 							"ts": moment(d["created_at"],'dd MMM DD HH:mm:ss ZZ YYYY','en').fromNow(),
 							"text": d["text"],
-							"urls": d["entities"]["urls"],
-							"hashtags": d["entities"]["hashtags"],
-							"user_mentions": d["entities"]["user_mentions"]
+							"entities": d["entities"]
 						}
 					})
 
