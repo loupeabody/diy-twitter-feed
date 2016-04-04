@@ -39,7 +39,22 @@
 				var newBody = body
 				if (entities.urls.length > 0) {
 					entities.urls.forEach(function(u) {
-						newBody = newBody.replace(u.url,"<a href="+u.url+">"+u.url+"</a>")
+						newBody = newBody.replace(u.url,"<a href=\""+u.url+"\">"+u.url+"</a>")
+					})
+				}
+				if (entities.media != undefined && entities.media.length > 0) {
+					entities.media.forEach(function(u) {
+						newBody = newBody.replace(u.url,"<a href=\""+u.url+"\">"+u.url+"</a>")
+					})
+				}
+				if (entities["user_mentions"].length > 0) {
+					entities["user_mentions"].forEach(function(u) {
+						newBody = newBody.replace("\@"+u["screen_name"],"<a href=\"https://twitter.com/"+u["screen_name"].toLowerCase()+"\">\@"+u["screen_name"]+"</a>")
+					})
+				}
+				if (entities.hashtags.length > 0) {
+					entities.hashtags.forEach(function(u) {
+						newBody = newBody.replace("\#"+u.text,"<a href=\"https://twitter.com/hashtag/"+u.text+"\">\#"+u.text+"</a>")
 					})
 				}
 				console.log(newBody)
