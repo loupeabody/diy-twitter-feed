@@ -6,7 +6,16 @@
 		<link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,300,600,700,900" rel="stylesheet" type="text/css">
 	</head>
 	<body>
+
+		<form class="getTweets">
+			<input class="getTweets-query" name="query" autofocus>
+			<input type="submit" id="submit-query" value="get tweets" class="getTweets-submit">
+			<label class="getTweets-label">enter username or hashtag</label>
+			<p class="getTweets-instructions">precede query with '#' for hashtags or '@' for usernames</p>
+		</form>
+
 		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.5/handlebars.min.js"></script>
+
 		<script id="main-template" type="text/x-handlebars-template">
 			<section class="tweets">
 				{{#each tweets}}
@@ -14,6 +23,7 @@
 				{{~/each}}
 			</section>
 		</script>
+
 		<script id="tweet-template" type="text/x-handlebars-template">
 			<div class="tweet cf">
 				<p class="tweet-body">{{{addEntitiesToBody text entities}}}</p>
@@ -27,54 +37,7 @@
 				</p>
 			</div>
 		</script>
-		<script type="text/javascript">
-			var tweetTemplateSource = document.getElementById('tweet-template').innerHTML,
-					mainTemplateSource = document.getElementById('main-template').innerHTML,
-					mainTemplate = Handlebars.compile(mainTemplateSource),
-					tweetTemplate = Handlebars.compile(tweetTemplateSource),
-					locals = { users: [], terms: [], tweets: [] }
 
-			Handlebars.registerPartial('tweetTemplate',tweetTemplate)
-			Handlebars.registerHelper('addEntitiesToBody',function(body, entities) {
-				var newBody = body
-				if (entities.urls.length > 0) {
-					entities.urls.forEach(function(u) {
-						newBody = newBody.replace(u.url,"<a href="+u.url+">"+u.url+"</a>")
-					})
-				}
-				console.log(newBody)
-				return new Handlebars.SafeString(newBody)
-			})
-
-			function makeRequest(method, url) {
-				return new Promise(function(resolve,reject) {
-					var xhr = new XMLHttpRequest()
-					xhr.addEventListener('error', reject)
-					xhr.addEventListener('load', resolve)
-					xhr.open(method, url)
-					xhr.send()
-				})
-			}
-
-			function getTwitterOAuthToken() { return makeRequest("GET", window.location.origin + "/token") }
-			function getUserTweets(token,usn) { return makeRequest("GET", window.location.origin + "/tweets/"+encodeURIComponent(token)+"/"+usn) }
-
-			function addTweetsToLocals(usn) {
-				return getTwitterOAuthToken()
-					.then(function(r) {
-						var token = JSON.parse(r.currentTarget.response)["token"]
-						return getUserTweets(token,usn)
-					})
-					.then(function(r) {
-						console.log(JSON.parse(r.currentTarget.response))
-						var tweets = JSON.parse(r.currentTarget.response)
-						tweets.map(function(t) {
-							locals.tweets.push(t)
-						})
-					})
-					.then(function(r) { document.body.innerHTML += mainTemplate(locals)})
-					.catch(function(err) { console.log(err) })
-			}
-		</script>
+		<script src="scripts/script.js" type="text/javascript"></script>
 	</body>
 </html>

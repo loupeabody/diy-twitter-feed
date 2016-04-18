@@ -17,6 +17,58 @@ body {
 		clear: both;
 }
 
+.getTweets {
+	position: relative;
+	max-width: 600px;
+	margin: 25px auto;
+	color: rgba(19,19,19,0.88);
+}
+.getTweets-query {
+	font-family: 'Source Sans Pro', serif;
+	font-size: 1.6rem;
+	font-weight: 700;
+	margin-right: 5px;
+	border: none;
+	border-bottom: 2px solid rgba(19,19,19,0.88);
+	background: none;
+	color: rgba(19,19,19,0.88);
+}
+.getTweets-query:active,
+.getTweets-query:focus {
+	outline: none;
+}
+.getTweets-label {
+	display: block;
+	font-weight: 700;
+	margin: 3px 0 0;
+}
+.getTweets-instructions {
+	font-size: 0.8rem;
+	font-weight: 600;
+	margin: 0;
+}
+.getTweets-submit {
+	position: relative;
+	top:-1px;
+	font-family: 'Source Sans Pro', serif;
+	font-size: 0.9rem;
+	font-weight: 700;
+	background: none;
+	color: rgba(19,19,19,0.88);
+	border: 2px solid rgba(19,19,19,0.88);
+	padding: 4px 7px 6px 8px;
+	border-radius: 3px;
+	cursor: pointer;
+}
+.getTweets-submit:hover {
+	background: rgba(19,19,19,0.68);
+	padding: 6px 9px 8px 10px;
+	color: magenta;
+	border: none;
+}
+.getTweets-submit:focus { outline: none; }
+.getTweets-submit:active { background: rgba(19,19,19,0.88); }
+
 .tweet {
 	position: relative;
 	max-width: 600px;
